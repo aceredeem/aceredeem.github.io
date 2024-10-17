@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redeem Code</title>
+    <style>
+        /* Styling for the entire page */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* Ace Drops in the top-left corner */
+        .brand {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 2rem;
+            color: #ff6b6b;
+            font-weight: bold;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        /* Main header for Redeem Code */
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            animation: fadeInDown 1.5s ease-in-out;
+        }
+
+        /* Inputs styling */
+        input[type="text"], input[type="submit"] {
+            padding: 15px;
+            border-radius: 30px;
+            border: none;
+            margin: 10px 0;
+            font-size: 1.2rem;
+            outline: none;
+            transition: all 0.3s ease-in-out;
+        }
+
+        input[type="text"] {
+            width: 300px;
+            background-color: #1e1e1e;
+            color: #fff;
+            text-align: center;
+            animation: fadeInUp 1.5s ease-in-out;
+        }
+
+        /* Submit button */
+        input[type="submit"] {
+            background-color: #ff6b6b;
+            color: #fff;
+            cursor: pointer;
+            animation: fadeInUp 1.5s ease-in-out;
+            transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #ff4949;
+            transform: scale(1.05);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Brand name in the top left corner -->
+    <div class="brand">Ace Drops</div>
+
+    <!-- Main page content -->
+    <h1>Redeem Code</h1>
+    <input type="text" id="codeInput" placeholder="Enter your code">
+    <input type="submit" id="submitCode" value="Claim">
+
+    <script>
+        document.getElementById("submitCode").addEventListener("click", function() {
+            const codeInput = document.getElementById("codeInput").value;
+
+            // Fetch the codes from the GitHub raw URL
+            fetch('https://raw.githubusercontent.com/enderprivatehosting/admin/refs/heads/main/codes')
+                .then(response => response.text())
+                .then(data => {
+                    const lines = data.split('\n');
+                    let valid = false;
+                    let genname = '';
+
+                    // Loop through each line to check for a matching code
+                    lines.forEach(line => {
+                        const [code, gen] = line.split(':');
+                        if (code === codeInput) {
+                            valid = true;
+                            genname = gen.trim();
+                        }
+                    });
+
+                    if (valid) {
+                        // Code is valid, display product info with animation
+                        document.body.innerHTML = `
+                            <div class="brand">Ace Drops</div>
+                            <h1>Your Product</h1>
+                            <p style="font-size: 1.5rem;">Lifetime ${genname} gen access</p>
+                            <input type="text" id="discordUsername" placeholder="Enter your discord username">
+                            <input type="submit" id="submitDiscord" value="Claim">
+                        `;
+
+                        document.getElementById("submitDiscord").addEventListener("click", function() {
+                            const discordUsername = document.getElementById("discordUsername").value;
+                            if (discordUsername) {
+                                document.body.innerHTML = `
+                                    <div class="brand">Ace Drops</div>
+                                    <h1>Your reward is on the way!</h1>
+                                    <p style="font-size: 1rem;">Note that this can take up to 24 hours!</p>
+                                `;
+
+                                // Send data to the webhook
+                                fetch('https://discordapp.com/api/webhooks/1296548609667502110/MWza9JaI0121zjWXAQ-CekR_Op130si-lamwSuAHWYMzB88sN9uICoXBqsXULiE6_lcr', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        embeds: [{
+                                            title: " Redeem Notification",
+                                            description: `@everyone Gen Name: ${genname}\nDiscord Username: ${discordUsername}`,
+                                            color: 3447003
+                                        }]
+                                    })
+                                });
+                            }
+                        });
+                    } else {
+                        // Invalid code alert
+                        alert("Invalid Code");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Could not load the code file.');
+                });
+        });
+    </script>
+</body>
+</html>
